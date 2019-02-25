@@ -6,6 +6,7 @@ downloaded on: 25 February 2019
 """
 
 from pymc import rbeta
+import numpy as np
 
 rand = np.random.rand
 
