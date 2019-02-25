@@ -35,7 +35,18 @@ class Bandits(object):
     
 class MABPolicy( object ):
     """
-    
+    This is a base class for multi-armed bandits policies.
+
+    parameters:
+        bandits: a Bandit class with .pull method
+
+    methods:
+        sample: sample and train; must be implemented by sub class
+
+    attributes:
+        N: the cumulative number of samples
+        choices: the historical choices as a (N,) array
+        score: the historical score as a (N,) array
     """
     def __init__(self, bandits):
         
@@ -52,8 +63,10 @@ class MABPolicy( object ):
 
 class BayesianStrategy( MABPolicy ):
     """
-    Implements a online, learning strategy to solve
+    Implements a online Bayesian Bandits learning strategy to solve
     the Multi-Armed Bandit problem.
+
+    Sub-class of MABPolicy base class.
     
     parameters:
         bandits: a Bandit class with .pull method
@@ -96,6 +109,25 @@ class BayesianStrategy( MABPolicy ):
         return 
 
 class epsilonGreedyStrategy( MABPolicy ):
+    """
+    Implements a online epsilon-greedy Q-learning strategy to solve
+    the Multi-Armed Bandit problem.
+
+    Sub-class of MABPolicy base class.
+    
+    parameters:
+        bandits: a Bandit class with .pull method
+    
+    methods:
+        sample_bandits(n): sample and train on n pulls.
+
+    attributes:
+        N: the cumulative number of samples
+        choices: the historical choices as a (N,) array
+        score: the historical score as a (N,) array
+
+    """
+    
     def __init__(self, bandits, epsilon):
         MABPolicy.__init__(self, bandits)
 
@@ -118,6 +150,7 @@ class epsilonGreedyStrategy( MABPolicy ):
             self.trials[ choice ] += 1
             # Update Q action-value using:
             # Q(a) <- Q(a) + 1/(k+1) * (r(a) - Q(a))
+            # note that self.trials[ choice ] has been incremented to k+1 above
             self.Q[ choice ] += (1./self.trials[ choice ]) * (float(result) - self.Q[ choice ])
             score[ k ] = result 
             self.N += 1
@@ -134,6 +167,6 @@ class epsilonGreedyStrategy( MABPolicy ):
             action_explore = np.random.randint( len(self.bandits) )  # explore random bandit
             return action_explore
         else:
-            #action_greedy = np.argmax(self.Q)  # exploit best current bandit
+            #randomly select from among the bandits with the current maximum Q value
             action_greedy = np.random.choice(np.flatnonzero(self.Q == self.Q.max()))
             return action_greedy
