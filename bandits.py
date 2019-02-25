@@ -33,7 +33,21 @@ class Bandits(object):
         return len(self.p)
 
     
-class BayesianStrategy( object ):
+class MABPolicy( object ):
+    def __init__(self, bandits):
+        
+        self.bandits = bandits
+        n_bandits = len( self.bandits )
+        self.wins = np.zeros( n_bandits )
+        self.trials = np.zeros(n_bandits )
+        self.N = 0
+        self.choices = []
+        self.score = []
+
+    def sample( self ):
+        raise NotImplementedError('MABPolicy must implement the sample method')
+
+class BayesianStrategy( MABPolicy ):
     """
     Implements a online, learning strategy to solve
     the Multi-Armed Bandit problem.
@@ -47,24 +61,17 @@ class BayesianStrategy( object ):
     attributes:
         N: the cumulative number of samples
         choices: the historical choices as a (N,) array
-        bb_score: the historical score as a (N,) array
+        score: the historical score as a (N,) array
 
     """
     
     def __init__(self, bandits):
         
-        self.bandits = bandits
-        n_bandits = len( self.bandits )
-        self.wins = np.zeros( n_bandits )
-        self.trials = np.zeros(n_bandits )
-        self.N = 0
-        self.choices = []
-        self.bb_score = []
+        MABPolicy.__init__(self, bandits)
 
-    
-    def sample_bandits( self, n=1 ):
+    def sample( self, n=1 ):
         
-        bb_score = np.zeros( n )
+        score = np.zeros( n )
         choices = np.zeros( n )
         
         for k in range(n):
@@ -77,10 +84,37 @@ class BayesianStrategy( object ):
             #update priors and score
             self.wins[ choice ] += result
             self.trials[ choice ] += 1
-            bb_score[ k ] = result 
+            score[ k ] = result 
             self.N += 1
             choices[ k ] = choice
             
-        self.bb_score = np.r_[ self.bb_score, bb_score ]
+        self.score = np.r_[ self.score, score ]
         self.choices = np.r_[ self.choices, choices ]
         return 
+
+class epsilonGreedyStrategy( MABPolicy ):
+    def __init__(self, bandits, epsilon):
+        MABPolicy.__init__(self, bandits)
+
+        self.epsilon = epsilon
+        self.Q = np.zeros(len( self.bandits ), dtype=np.float)
+
+    def sample( self, n=1 ):
+        pass
+    
+    # Update Q action-value using:
+    # Q(a) <- Q(a) + 1/(k+1) * (r(a) - Q(a))
+    def update_Q(self, action, reward):
+        self.k[action] += 1  # update action counter k -> k+1
+        self.Q[action] += (1./self.k[action]) * (reward - self.Q[action])
+
+    # Choose action using an epsilon-greedy agent
+    def get_action(self, bandit, force_explore=False):
+        rand = np.random.random()  # [0.0,1.0)
+        if (rand < self.epsilon) or force_explore:
+            action_explore = np.random.randint(bandit.N)  # explore random bandit
+            return action_explore
+        else:
+            #action_greedy = np.argmax(self.Q)  # exploit best current bandit
+            action_greedy = np.random.choice(np.flatnonzero(self.Q == self.Q.max()))
+            return action_greedy
