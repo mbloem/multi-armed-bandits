@@ -34,6 +34,9 @@ class Bandits(object):
 
     
 class MABPolicy( object ):
+    """
+    
+    """
     def __init__(self, bandits):
         
         self.bandits = bandits
@@ -100,19 +103,35 @@ class epsilonGreedyStrategy( MABPolicy ):
         self.Q = np.zeros(len( self.bandits ), dtype=np.float)
 
     def sample( self, n=1 ):
-        pass
-    
-    # Update Q action-value using:
-    # Q(a) <- Q(a) + 1/(k+1) * (r(a) - Q(a))
-    def update_Q(self, action, reward):
-        self.k[action] += 1  # update action counter k -> k+1
-        self.Q[action] += (1./self.k[action]) * (reward - self.Q[action])
+        score = np.zeros( n )
+        choices = np.zeros( n )
+        
+        for k in range(n):
+            #sample from the bandits's priors, and select the largest sample
+            choice = self.get_action()
+            
+            #sample the chosen bandit
+            result = self.bandits.pull( choice )
+            
+            #update stats and Q action-value
+            self.wins[ choice ] += result
+            self.trials[ choice ] += 1
+            # Update Q action-value using:
+            # Q(a) <- Q(a) + 1/(k+1) * (r(a) - Q(a))
+            self.Q[ choice ] += (1./self.trials[ choice ]) * (float(result) - self.Q[ choice ])
+            score[ k ] = result 
+            self.N += 1
+            choices[ k ] = choice
+            
+        self.score = np.r_[ self.score, score ]
+        self.choices = np.r_[ self.choices, choices ]
+        return
 
     # Choose action using an epsilon-greedy agent
-    def get_action(self, bandit, force_explore=False):
+    def get_action( self, force_explore=False ):
         rand = np.random.random()  # [0.0,1.0)
         if (rand < self.epsilon) or force_explore:
-            action_explore = np.random.randint(bandit.N)  # explore random bandit
+            action_explore = np.random.randint( len(self.bandits) )  # explore random bandit
             return action_explore
         else:
             #action_greedy = np.argmax(self.Q)  # exploit best current bandit
