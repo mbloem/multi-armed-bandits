@@ -1,7 +1,15 @@
 """
-author: Cameron Davidson-Pilon
+bandits.py
 
-from: https://gist.github.com/CamDavidsonPilon/4c4561cfd9463fb875b6
+author: Michael Bloem
+mbloem@mosaicdatascience.com
+
+Most of this code is based on Cameron Davidson-Pilon's Baysian Bandits code.
+https://gist.github.com/CamDavidsonPilon/4c4561cfd9463fb875b6
+downloaded on: 25 February 2019
+
+The epsilon-greedy policy is based on the code by Anson Wong
+https://github.com/ankonzoid/LearningX/blob/master/classical_RL/MAB/MAB.py
 downloaded on: 25 February 2019
 """
 
@@ -12,7 +20,12 @@ rand = np.random.rand
 
 class Bandits(object):
     """
-    This class represents N bandits machines.
+    This class represents an N-armed bandits machine.
+
+    author: Cameron Davidson-Pilon
+
+    from: https://gist.github.com/CamDavidsonPilon/4c4561cfd9463fb875b6
+    downloaded on: 25 February 2019
 
     parameters:
         p_array: a (n,) Numpy array of probabilities >0, <1.
@@ -67,6 +80,11 @@ class BayesianStrategy( MABPolicy ):
     the Multi-Armed Bandit problem.
 
     Sub-class of MABPolicy base class.
+
+    author: Cameron Davidson-Pilon
+
+    from: https://gist.github.com/CamDavidsonPilon/4c4561cfd9463fb875b6
+    downloaded on: 25 February 2019
     
     parameters:
         bandits: a Bandit class with .pull method
@@ -114,6 +132,9 @@ class epsilonGreedyStrategy( MABPolicy ):
     the Multi-Armed Bandit problem.
 
     Sub-class of MABPolicy base class.
+
+    Based on https://github.com/ankonzoid/LearningX/blob/master/classical_RL/MAB/MAB.py
+    (author: Anson Wong / git: ankonzoid)
     
     parameters:
         bandits: a Bandit class with .pull method
