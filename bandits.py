@@ -48,6 +48,8 @@ class Bandits(object):
     
 class MABPolicy( object ):
     """
+    MABPolicy
+    
     This is a base class for multi-armed bandits policies.
 
     parameters:
@@ -82,6 +84,8 @@ class MABPolicy( object ):
 
 class BayesianStrategy( MABPolicy ):
     """
+    BayesianStrategy
+    
     Implements a online Bayesian Bandits learning strategy to solve
     the Multi-Armed Bandit problem.
 
@@ -135,6 +139,8 @@ class BayesianStrategy( MABPolicy ):
 
 class epsilonGreedyStrategy( MABPolicy ):
     """
+    epsilonGreedyStrategy
+    
     Implements a online epsilon-greedy Q-learning strategy to solve
     the Multi-Armed Bandit problem.
 
@@ -203,6 +209,8 @@ class epsilonGreedyStrategy( MABPolicy ):
 
 class RandomStrategy( MABPolicy ):
     """
+    RandomStrategy
+    
     Implements a random strategy for
     the Multi-Armed Bandit problem.
 
