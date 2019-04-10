@@ -56,19 +56,22 @@ class MABPolicy( object ):
         bandits: a Bandit class with .pull method
 
     methods:
-        sample: sample and train; must be implemented by sub class
+        sample(n): sample and train on n pulls; must be implemented by sub class
 
     attributes:
         N: the cumulative number of samples
-        choices: the historical choices as a (N,) array
-        score: the historical score as a (N,) array
+        wins: the number of wins per bandit
+        trials: the number of pulls per bandit
+        choices: the historical choices per sample
+        score: the historical score per sample
+        regret: the expected regret per sample
     """
     def __init__(self, bandits):
         
         self.bandits = bandits
         n_bandits = len( self.bandits )
         self.wins = np.zeros( n_bandits )
-        self.trials = np.zeros(n_bandits )
+        self.trials = np.zeros( n_bandits )
         self.N = 0
         self.choices = []
         self.score = []
@@ -100,13 +103,10 @@ class BayesianStrategy( MABPolicy ):
         bandits: a Bandit class with .pull method
     
     methods:
-        sample_bandits(n): sample and train on n pulls.
+        sample(n): sample and train on n pulls.
 
     attributes:
-        N: the cumulative number of samples
-        choices: the historical choices as a (N,) array
-        score: the historical score as a (N,) array
-
+        same as for MABPolicy base class
     """
     
     def __init__(self, bandits):
@@ -153,13 +153,11 @@ class epsilonGreedyStrategy( MABPolicy ):
         bandits: a Bandit class with .pull method
     
     methods:
-        sample_bandits(n): sample and train on n pulls.
+        sample(n): sample and train on n pulls.
+        get_action(force_explore): select an action.
 
     attributes:
-        N: the cumulative number of samples
-        choices: the historical choices as a (N,) array
-        score: the historical score as a (N,) array
-
+        same as for MABPolicy base class
     """
     
     def __init__(self, bandits, epsilon):
@@ -220,13 +218,10 @@ class RandomStrategy( MABPolicy ):
         bandits: a Bandit class with .pull method
     
     methods:
-        sample_bandits(n): sample and train on n pulls.
+        sample(n): sample and train on n pulls.
 
     attributes:
-        N: the cumulative number of samples
-        choices: the historical choices as a (N,) array
-        score: the historical score as a (N,) array
-
+        same as for MABPolicy base class
     """
     def __init__(self, bandits):
         
